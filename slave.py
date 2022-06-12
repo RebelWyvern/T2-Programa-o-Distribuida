@@ -5,14 +5,13 @@ import datetime
 import socket
 import time
 
-from T2.src.server import Main
-
+dados = {}
 
 def sendTime(slave, dados):
     while True:
         slave.send(str(dados.time+dados.adelay).encode())
 
-def reciveTime():
+def receiveTime():
     a = '1'
 
 def initSlave():
@@ -28,7 +27,7 @@ def initSlave():
     'adelay' : arg[4],
     'isServer' : arg[5]
     } 
-    if isServer:
+    if 'isServer':
         print('I am a server')
     else:
         slave = socket.socket()
@@ -36,5 +35,42 @@ def initSlave():
         servIP = input('prompt')
         slave.connect(servIP, slave.port)
 
+def getDiferencaRelogios():
+    
+        dadosAtuaisCliente = dados.copy 
+        listaTemposDiferentes = list(client['adelay'] for client_addr, client in dados.items())
+ 
+        somaDiferenca = sum(listaTemposDiferentes, \
+                                datetime.timedelta(0,0))
+
+        mediaDiferenca = somaDiferenca \
+                               / len(dados)
+
+        return mediaDiferenca
 
 
+def sincronizaRelogios():
+    while True:
+        print("novo ciclo de sincronização iniciada")
+        print("clientes a serem sincronizados: " + \
+                                        str(len(dados)) )
+
+        if len(dados) > 0:
+            mediaDiferenca = getDiferencaRelogios()
+
+            for client_addr, client in dados.items():
+                try:
+                    tempoSincronizado = \
+                                 datetime.datetime.now() + \
+                                                      mediaDiferenca  
+
+                    client['ip'].send(str(tempoSincronizado).encode())#não tenho certeza se é client['ip']
+
+                except Exception as e:
+                    print("Something went wrong while " + \
+                          "sending synchronized time " + \
+                          "through " + str(client_addr))     
+                else :
+                    print("sem dados do cliente")
+ 
+                print("\n\n")              
