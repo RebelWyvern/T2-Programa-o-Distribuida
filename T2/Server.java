@@ -20,14 +20,17 @@ public class Server implements Runnable {
     static String ptime;
     static String aDelay;
     static ArrayList<Process> timesArray = new ArrayList<Process>();
-    static ArrayList<Socket> connArray = new ArrayList<Socket>();
+    // static ArrayList<Socket> connArray = new ArrayList<Socket>();
 
-    public Server(String ipServer, int portServer) throws IOException {
+    public Server(int idServer, String ipServer, int portServer, String timeServer, String aDelayServer) throws IOException {
+        id = idServer;
         multicast = new MulticastSocket();
         socket = new ServerSocket(portServer);
         time = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
         ip = InetAddress.getByName(ipServer);
         port = portServer;
+        ptime = timeServer;
+        aDelay = aDelayServer;
     }
 
     @Override
@@ -70,31 +73,30 @@ public class Server implements Runnable {
             while(true){
                 Socket conn = socket.accept();
 
-                // if(conn.getInetAddress().getHostAddress() != null){
-                //     connArray.add(conn);
-                // }
-
-                System.out.println("\n Conexao estabelecida com: " + conn.getInetAddress().getHostAddress());
+                System.out.println("\nConexao estabelecida com: " + conn.getInetAddress().getHostAddress());
 
                 ObjectOutputStream outputStream = new ObjectOutputStream(conn.getOutputStream());
                 outputStream.flush();
                 ObjectInputStream intputStream = new ObjectInputStream(conn.getInputStream());
 
-                outputStream.writeObject("Conexao estabelecida com sucesso...\n");
+                String[] msg = separateMessage(intputStream.readObject().toString());
 
-                // String[] msg = separateMessage(intputStream.readObject().toString());
+                boolean find = true;
 
-                // for(int i=0; i<timesArray.size(); i++){
-                //     if(timesArray.get(i).id != Integer.parseInt((msg[0]))){
-                //         timesArray.add(new Process(Integer.parseInt(msg[0]), msg[1]));
-                //     }
-                // }
+                for(int i=0; i<timesArray.size(); i++){
+                    if(timesArray.get(i).id == Integer.parseInt((msg[0]))){
+                        find = false;
+                    }
+                }
 
-                // if(timesArray.size() == connArray.size()){
-                //     System.out.println("Ta igual a quantidade:");
-                // }
+                if(find){
+                    timesArray.add(new Process(Integer.parseInt(msg[0]), new String(msg[1]+":"+msg[2]+":"+msg[3])));
+                }
 
-                System.out.println("\n Tempo do Cliente: "+intputStream.readObject());
+                System.out.println(calculateTimes());
+                time = calculateTimes();
+                outputStream.writeObject("update:"+calculateTimes());
+
                 outputStream.close();
                 conn.close();
             }
@@ -106,14 +108,16 @@ public class Server implements Runnable {
         }
 	}
 
-    public static String calculateTimes(ArrayList<String> timesArray){
+    public static String calculateTimes(){
+        timesArray.add(new Process(id, time));
+
         long seconds = 0;
 
-        for(String tClient : timesArray){
-            String[] time = tClient.split(":");
-            seconds = seconds + Integer.valueOf(time[0]) * 60 * 60;
-            seconds = seconds + Integer.valueOf(time[1]) * 60;
-            seconds = seconds + Integer.valueOf(time[2]);
+        for(int i=0; i<timesArray.size(); i++){
+            String[] timer = timesArray.get(i).time.split(":");
+            seconds = seconds + Integer.valueOf(timer[0]) * 60 * 60;
+            seconds = seconds + Integer.valueOf(timer[1]) * 60;
+            seconds = seconds + Integer.valueOf(timer[2]);
         }
 
         seconds = seconds / timesArray.size();
@@ -125,6 +129,8 @@ public class Server implements Runnable {
     }
 
     private static String[] separateMessage(String message){
+        System.out.println("\nMsg Client: " + message);
+
         String[] str = message.split(":");
         return str;
     }

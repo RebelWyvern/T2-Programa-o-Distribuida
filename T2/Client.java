@@ -17,11 +17,14 @@ public class Client implements Runnable{
     static String ptime;
     static String aDelay;
 
-    Client(String ipClient, int portClient) throws IOException {
+    Client(int idClient, String ipClient, int portClient, String timeClient, String aDelayClient) throws IOException {
+        id = idClient;
         multicast = new MulticastSocket(MULTICAST_PORT);
         time = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
         ip = InetAddress.getByName(ipClient);
         port = portClient;
+        ptime = timeClient;
+        aDelay = aDelayClient;
     }
 
     @Override
@@ -45,10 +48,6 @@ public class Client implements Runnable{
                         sendMessage(ipServer, portServer);
                     }
 
-                    if(method.equalsIgnoreCase("update")){
-                        // updateTimer(ipServer, portServer);
-                    }
-                    
                     if (method.equalsIgnoreCase("end")) {
                         break;
                     }
@@ -63,6 +62,8 @@ public class Client implements Runnable{
     }
 
     public static String[] separateMessage(String message){
+        System.out.println("\nMSG do Server: " + message);
+
         String[] str = message.split(":");
         return str;
     }
@@ -76,26 +77,18 @@ public class Client implements Runnable{
             
             outputStream.writeObject(id+":"+time);
 
-            System.out.println(intputStream.readObject());
+            String[] msg = separateMessage(intputStream.readObject().toString());
+
+            if(msg[0].equalsIgnoreCase("update")){
+                updateTimer(msg[1]+":"+msg[2]+":"+msg[3]);
+            }
         } catch (Exception e) {
             socket.close();
             e.printStackTrace();
         }
     }
 
-    // public void updateTimer(String timer) throws IOException {
-    //     Socket socket = new Socket(ipServer, Integer.parseInt(portServer));
-    //     try {
-    //         ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-    //         outputStream.flush();
-    //         ObjectInputStream intputStream = new ObjectInputStream(socket.getInputStream());
-            
-    //         outputStream.writeObject("\nReenviando mensagem..." + port);
-
-    //         System.out.println(intputStream.readObject());
-    //     } catch (Exception e) {
-    //         socket.close();
-    //         e.printStackTrace();
-    //     }
-    // }
+    public void updateTimer(String timer) throws IOException {
+        time = timer;
+    }
 }
