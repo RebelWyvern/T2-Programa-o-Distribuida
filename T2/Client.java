@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 public class Client implements Runnable {
 
@@ -27,6 +28,16 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
+        Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				public void run() {
+                    
+                    time = toSec(time);
+                    time = toFormatHour(String.valueOf(Integer.parseInt(time) + 10));
+				}
+			}, 10000, 5000);
+        
+
         while (true) {
             try {
                 multicast.joinGroup(InetAddress.getByName(MULTICAST_IP));
@@ -53,9 +64,13 @@ public class Client implements Runnable {
                 multicast.leaveGroup(InetAddress.getByName(MULTICAST_IP));
                 multicast.close();
 
+                
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            
+            
         }
     }
 
@@ -78,7 +93,7 @@ public class Client implements Runnable {
             String[] msg = separateMessage(intputStream.readObject().toString());
 
             if (msg[0].equalsIgnoreCase("update")) {
-                updateTimer(msg[1]+":"+msg[2]+":"+msg[3]);
+                updateTimer(msg[1] + ":" + msg[2] + ":" + msg[3]);
             }
         } catch (Exception e) {
             socket.close();

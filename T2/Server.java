@@ -33,9 +33,17 @@ public class Server implements Runnable {
 			timer.schedule(new TimerTask() {
 				public void run() {
                     muticast();
-                    
 				}
-			}, 0, 5000);   
+			}, 2000, 5000);
+
+            Timer timer2 = new Timer();
+			timer2.schedule(new TimerTask() {
+				public void run() {
+                    
+                    time = toSec(time);
+                    time = toFormatHour(String.valueOf(Integer.parseInt(time) + 10));
+				}
+			}, 10000, 5000);
 
             Thread th = new Thread(new Runnable() {
                 @Override
@@ -46,6 +54,13 @@ public class Server implements Runnable {
                 }
             });
             th.start();
+
+            // new java.util.Timer().schedule(new TimerTask() {
+            //     @Override
+            //     public void run() {
+                    
+            //     }
+            // }, 1);
     }
 
     private static void muticast() {
@@ -88,7 +103,7 @@ public class Server implements Runnable {
                 }
 
                 time = calculateTimes();
-                System.out.println("Calculated time"+ time);
+                // System.out.println("Calculated time"+ time);
                 int sentTime = Integer.parseInt(toSec(time));
                 sentTime = sentTime - Integer.parseInt(aDelay) - (Integer.parseInt(msg[1]) + Integer.parseInt(msg[2])/2)/1000;
                 
