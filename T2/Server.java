@@ -41,9 +41,10 @@ public class Server implements Runnable {
 				public void run() {
                     
                     time = toSec(time);
-                    time = toFormatHour(String.valueOf(Integer.parseInt(time) + 10));
+                    time = toFormatHour(String.valueOf(Integer.parseInt(time) + 1));
+                    System.out.println("Time:"+ time);
 				}
-			}, 10000, 5000);
+			}, 10000, 500);
 
             Thread th = new Thread(new Runnable() {
                 @Override
@@ -108,7 +109,7 @@ public class Server implements Runnable {
                 sentTime = sentTime - Integer.parseInt(aDelay) - (Integer.parseInt(msg[1]) + Integer.parseInt(msg[2])/2)/1000;
                 
                 outputStream.writeObject("update:"+ toFormatHour(String.valueOf(sentTime)));
-                
+                time = toFormatHour(String.valueOf(sentTime));
                 outputStream.close();
                 conn.close();
             }

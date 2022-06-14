@@ -33,9 +33,9 @@ public class Client implements Runnable {
 				public void run() {
                     
                     time = toSec(time);
-                    time = toFormatHour(String.valueOf(Integer.parseInt(time) + 10));
+                    time = toFormatHour(String.valueOf(Integer.parseInt(time) + 1));
 				}
-			}, 10000, 5000);
+			}, 10000, 500);
         
 
         while (true) {
@@ -111,13 +111,12 @@ public class Client implements Runnable {
     }
 
     public static String toFormatHour(String time) {
-        System.out.println("time in seconds: " + time);
         long seconds = Integer.parseInt(time);
         long hours = seconds / 60 / 60;
         long minutes = (seconds / 60) % 60;
         seconds = seconds % 60;
 
-        System.out.print(String.format("Formated: %02d:%02d:%02d", hours, minutes, seconds));
+        System.out.println(String.format("Formated: %02d:%02d:%02d", hours, minutes, seconds));
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
