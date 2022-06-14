@@ -1,11 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import javax.sound.sampled.Port;
 
 public class Server implements Runnable {
 
@@ -20,16 +15,15 @@ public class Server implements Runnable {
     static String ptime;
     static String aDelay;
     static ArrayList<Process> timesArray = new ArrayList<Process>();
-    // static ArrayList<Socket> connArray = new ArrayList<Socket>();
 
-    public Server(int idServer, String ipServer, int portServer, String timeServer, String aDelayServer) throws IOException {
+    public Server(int idServer, String ipServer, int portServer, String timeServer, String pTimeServer, String aDelayServer) throws IOException {
         id = idServer;
         multicast = new MulticastSocket();
         socket = new ServerSocket(portServer);
-        time = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
+        time = timeServer;
         ip = InetAddress.getByName(ipServer);
         port = portServer;
-        ptime = timeServer;
+        ptime = pTimeServer;
         aDelay = aDelayServer;
     }
 

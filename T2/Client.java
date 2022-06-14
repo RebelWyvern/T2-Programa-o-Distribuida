@@ -1,8 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class Client implements Runnable{
 
@@ -17,13 +14,13 @@ public class Client implements Runnable{
     static String ptime;
     static String aDelay;
 
-    Client(int idClient, String ipClient, int portClient, String timeClient, String aDelayClient) throws IOException {
+    Client(int idClient, String ipClient, int portClient, String timeClient, String pTimeClient, String aDelayClient) throws IOException {
         id = idClient;
         multicast = new MulticastSocket(MULTICAST_PORT);
-        time = DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
+        time = timeClient;
         ip = InetAddress.getByName(ipClient);
         port = portClient;
-        ptime = timeClient;
+        ptime = pTimeClient;
         aDelay = aDelayClient;
     }
 
