@@ -84,12 +84,17 @@ public class Server implements Runnable {
                 }
 
                 if(find){
-                    timesArray.add(new Process(Integer.parseInt(msg[0]), new String(msg[1]+":"+msg[2]+":"+msg[3])));
+                    timesArray.add(new Process(Integer.parseInt(msg[0]), new String(toFormatHour(msg[1])), new String(msg[2]), new String(msg[3])));
                 }
 
-                System.out.println(calculateTimes());
                 time = calculateTimes();
-                outputStream.writeObject("update:"+calculateTimes());
+                System.out.println("Calculated time"+ time);
+                int sentTime = Integer.parseInt(toSec(time));
+                sentTime = sentTime - (Integer.parseInt(msg[1]) + Integer.parseInt(msg[2]))/1000;
+                outputStream.writeObject("update:"+ toFormatHour(String.valueOf(sentTime)));
+                // for(int i=0; i<timesArray.size(); i++){
+                //     socket(new Datagra)
+                // }
 
                 outputStream.close();
                 conn.close();
@@ -103,7 +108,8 @@ public class Server implements Runnable {
 	}
 
     public static String calculateTimes(){
-        timesArray.add(new Process(id, time));
+        Process server = new Process(id, time, ptime , aDelay);
+        timesArray.add(server);
 
         long seconds = 0;
 
@@ -119,6 +125,18 @@ public class Server implements Runnable {
         long minutes = (seconds / 60) % 60;
         seconds = seconds % 60;
 
+        timesArray.remove(server);
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public static String toFormatHour(String time){
+        
+        long seconds = Integer.parseInt(time);
+        long hours = seconds / 60 / 60;
+        long minutes = (seconds / 60) % 60;
+        seconds = seconds % 60;
+        
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
@@ -127,5 +145,13 @@ public class Server implements Runnable {
 
         String[] str = message.split(":");
         return str;
+    }
+    private static String toSec(String times) {
+        String[] timer = times.split(":");
+        int seconds = 0;
+        seconds = seconds + Integer.valueOf(timer[0]) * 60 * 60;
+        seconds = seconds + Integer.valueOf(timer[1]) * 60;
+        seconds = seconds + Integer.valueOf(timer[2]);
+        return String.valueOf(seconds);
     }
 }

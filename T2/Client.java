@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
 
-public class Client implements Runnable{
+public class Client implements Runnable {
 
     private static final int MULTICAST_PORT = 4321;
     private static final String MULTICAST_IP = "230.0.0.0";
@@ -14,7 +14,8 @@ public class Client implements Runnable{
     static String ptime;
     static String aDelay;
 
-    Client(int idClient, String ipClient, int portClient, String timeClient, String pTimeClient, String aDelayClient) throws IOException {
+    Client(int idClient, String ipClient, int portClient, String timeClient, String pTimeClient, String aDelayClient)
+            throws IOException {
         id = idClient;
         multicast = new MulticastSocket(MULTICAST_PORT);
         time = timeClient;
@@ -25,8 +26,8 @@ public class Client implements Runnable{
     }
 
     @Override
-    public void run (){
-        while(true){
+    public void run() {
+        while (true) {
             try {
                 multicast.joinGroup(InetAddress.getByName(MULTICAST_IP));
                 while (true) {
@@ -34,14 +35,14 @@ public class Client implements Runnable{
                     multicast.receive(packet);
                     buf = packet.getData();
                     System.out.print(new String(buf));
-                    
+
                     String[] messageArray = separateMessage(new String(buf));
 
                     String method = messageArray[0].trim();
                     String ipServer = messageArray[1].trim();
                     String portServer = messageArray[2].trim();
 
-                    if(method.equalsIgnoreCase("get")){
+                    if (method.equalsIgnoreCase("get")) {
                         sendMessage(ipServer, portServer);
                     }
 
@@ -58,7 +59,7 @@ public class Client implements Runnable{
         }
     }
 
-    public static String[] separateMessage(String message){
+    public static String[] separateMessage(String message) {
         System.out.println("\nMSG do Server: " + message);
 
         String[] str = message.split(":");
@@ -71,12 +72,12 @@ public class Client implements Runnable{
             ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             ObjectInputStream intputStream = new ObjectInputStream(socket.getInputStream());
-            
-            outputStream.writeObject(id+":"+time);
+
+            outputStream.writeObject(id + ":" + toSec(time) + ":" + ptime + ":" + aDelay);
 
             String[] msg = separateMessage(intputStream.readObject().toString());
 
-            if(msg[0].equalsIgnoreCase("update")){
+            if (msg[0].equalsIgnoreCase("update")) {
                 updateTimer(msg[1]+":"+msg[2]+":"+msg[3]);
             }
         } catch (Exception e) {
@@ -85,7 +86,28 @@ public class Client implements Runnable{
         }
     }
 
+    public String toSec(String times) {
+        String[] timer = times.split(":");
+        int seconds = 0;
+        seconds = seconds + Integer.valueOf(timer[0]) * 60 * 60;
+        seconds = seconds + Integer.valueOf(timer[1]) * 60;
+        seconds = seconds + Integer.valueOf(timer[2]);
+        return String.valueOf(seconds);
+    }
+
+    public static String toFormatHour(String time) {
+        System.out.println("time in seconds: " + time);
+        long seconds = Integer.parseInt(time);
+        long hours = seconds / 60 / 60;
+        long minutes = (seconds / 60) % 60;
+        seconds = seconds % 60;
+
+        System.out.print(String.format("Formated: %02d:%02d:%02d", hours, minutes, seconds));
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
     public void updateTimer(String timer) throws IOException {
+        System.out.println("\nNew Timer: " + timer);
         time = timer;
     }
 }

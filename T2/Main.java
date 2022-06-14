@@ -4,8 +4,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 7) {
-            System.out.println("Criar Servidor: java Main server <server_id> <server_ip> <server_port> <server_time>(HH:mm:ss) <server_ptime>(em mm) <server_adelay>(mm)");
-            System.out.println("Registrar Peer: java Main client <client_id> <client_ip> <client_port> <client_time>(HH:mm:ss) <client_ptime>(em mm) <client_adelay>(mm)");
+            System.out.println("Criar Servidor: java Main server <server_id> <server_ip> <server_port> <server_time>(HH:mm:ss) <server_ptime>(em ms) <server_adelay>(ms)");
+            System.out.println("Registrar Peer: java Main client <client_id> <client_ip> <client_port> <client_time>(HH:mm:ss) <client_ptime>(em ms) <client_adelay>(ms)");
             return;
         } else {
             switch(args[0]){
